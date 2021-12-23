@@ -5,20 +5,39 @@ module Rom
     module Commands
       # DynamoDB create command
       class Create < ROM::Commands::Create
+        adapter :dynamodb
+
+        use :schema
+
+        after :finalize
+
         def execute(tuples)
           Array([tuples]).flatten.map do |tuple|
             attributes = input[tuple]
-            dataset.insert(attributes.to_h)
+            dataset.insert(attributes)
+            attributes
           end
         end
 
         def dataset
           relation.dataset
         end
+
+        private
+
+        def finalize(tuples)
+          tuples.map { |t| relation.output_schema[t] }
+        end
       end
 
       # DynamoDB update command
       class Update < ROM::Commands::Update
+        adapter :dynamodb
+
+        use :schema
+
+        after :finalize
+
         def execute(params)
           attributes = input[params]
           relation.map do |tuple|
@@ -29,13 +48,23 @@ module Rom
         def dataset
           relation.dataset
         end
+
+        private
+
+        def finalize(tuples)
+          tuples.map { |t| relation.output_schema[t] }
+        end
       end
 
       # DynamoDB delete command
       class Delete < ROM::Commands::Delete
+        adapter :dynamodb
+
+        use :schema
+
         def execute
           relation.to_a.tap do |tuples|
-            tuples.each { |t| dataset.delete(t) }
+            tuples.each { |t| dataset.delete(input[t]) }
           end
         end
 

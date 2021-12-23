@@ -16,6 +16,10 @@ module Rom
           block.call(ROM::OpenStruct.new(hash))
         end
       end
+
+      def base_name
+        name
+      end
     end
   end
 end
