@@ -72,6 +72,30 @@ module Rom
           relation.dataset
         end
       end
+
+      class Increment < ROM::Commands::Update
+        adapter :dynamo
+
+        use :schema
+
+        after :finalize
+
+        def execute(params)
+          relation.map do |tuple|
+            dataset.increment(tuple, params)
+          end
+        end
+
+        private
+
+        def dataset
+          relation.dataset
+        end
+
+        def finalize(tuples)
+          tuples.map { |t| relation.output_schema[t] }
+        end
+      end
     end
   end
 end
