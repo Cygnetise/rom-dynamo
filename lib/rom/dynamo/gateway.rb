@@ -12,8 +12,7 @@ module Rom
       end
 
       def dataset(name)
-        name = "#{@prefix}#{name}"
-        @datasets[name] ||= _has?(name) && Dataset.new(connection: @connection, name: name)
+        @datasets[name] ||= Dataset.new(connection: @connection, name: name)
       end
 
       def dataset?(name)
@@ -21,7 +20,7 @@ module Rom
       end
 
       def [](name)
-        @datasets["#{@prefix}#{name}"]
+        @datasets[name]
       end
 
       private
